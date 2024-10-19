@@ -846,7 +846,7 @@ function toggleNav() {
 
 // Next and previous pages
 function previousPage() {
-  const currentHref = window.location.href.split("/").pop();
+  const currentHref = window.location.href.split("/").pop() || "index.html";
   const navItems = document.querySelectorAll(".nav__list-link");
   for (let i = 0; i < navItems.length; i++) {
     if (navItems[i].getAttribute("href") === currentHref) {
@@ -861,7 +861,7 @@ function previousPage() {
 }
 
 function nextPage() {
-  const currentHref = window.location.href.split("/").pop();
+  const currentHref = window.location.href.split("/").pop() || "index.html";
   const navItems = document.querySelectorAll(".nav__list-link");
   for (let i = 0; i < navItems.length; i++) {
     if (navItems[i].getAttribute("href") === currentHref) {
