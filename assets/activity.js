@@ -660,7 +660,7 @@ function prepareSortingActivity(section) {
   categories.forEach((category) => {
     category.addEventListener("dragover", allowDrop);
     category.addEventListener("drop", dropSort);
-    category.addEventListener("click", () => placeWord(category.id));
+    category.addEventListener("click", () => placeWord(category.dataset.activityCategory));
   });
 
   document.getElementById("feedback").addEventListener("click", resetActivity);
@@ -842,9 +842,9 @@ function dropSort(event) {
   event.preventDefault();
   const data = event.dataTransfer.getData("text");
   currentWord = data;
-  const category = event.target.closest(".category").id;
+  const category = event.target.closest(".category").dataset.activityCategory;
   const categoryName = category;
-  placeWord(categoryName);
+  placeWord(category);
   highlightBoxes(false);
 }
 

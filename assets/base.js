@@ -172,12 +172,18 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       }
 
-      //Set the initial page number
-      const pageSectionMetaTag = document.querySelector(
-        'meta[name="page-section-id"]'
-      );
-      document.getElementById("page-section-id").innerText =
-        pageSectionMetaTag.getAttribute("content");
+      // Set the initial page number
+      const pageSectionMetaTag = document.querySelector('meta[name="page-section-id"]');
+      const pageSectionContent = pageSectionMetaTag.getAttribute("content");
+
+      if (pageSectionContent) {
+        const parts = pageSectionContent.split('_').map(Number);
+        const humanReadablePage = parts.length === 2 
+          ? `Page ${parts[0] + 1}.${parts[1] + 1}` 
+          : `Page ${parts[0] + 1}`;
+        
+        document.getElementById("page-section-id").innerText = humanReadablePage;
+      }
 
       // Fetch translations and set up click handlers for elements with data-id
       await fetchTranslations();
