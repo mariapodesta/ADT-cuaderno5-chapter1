@@ -172,6 +172,20 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       }
 
+      // Append page and section numbers to nav list items
+      const navListItems = document.querySelectorAll(".nav__list-item");
+
+      navListItems.forEach((item) => {
+        const link = item.querySelector(".nav__list-link");
+        const href = link.getAttribute("href");
+        const pageSectionMatch = href.match(/(\d+)_(\d+)/);
+
+        if (pageSectionMatch) {
+          const [_, pageNumber, sectionNumber] = pageSectionMatch.map(Number);
+          link.innerText = `Page ${pageNumber + 1}.${sectionNumber + 1}: ${link.innerText}`;
+        }
+      });
+
       // Set the initial page number
       const pageSectionMetaTag = document.querySelector('meta[name="page-section-id"]');
       const pageSectionContent = pageSectionMetaTag.getAttribute("content");
