@@ -197,8 +197,24 @@ document.addEventListener("DOMContentLoaded", function () {
           : `Page ${parts[0] + 1}`;
         
         document.getElementById("page-section-id").innerText = humanReadablePage;
+
+        // Highlight the current page in the navigation menu
+        navListItems.forEach((item) => {
+          const link = item.querySelector(".nav__list-link");
+          const href = link.getAttribute("href");
+          if (href.includes(pageSectionContent)) {
+            item.classList.add("border-l-4", "border-blue-500", "bg-blue-100", "p-2");
+            link.classList.add("text-black");
+          } else {
+            item.classList.remove("border-l-4", "border-blue-500", "bg-blue-100", "p-2");
+            link.classList.remove("text-black");
+            link.classList.add("text-black");
+          }
+        });
       }
 
+      
+      
       // Fetch translations and set up click handlers for elements with data-id
       await fetchTranslations();
       document.querySelectorAll("[data-id]").forEach((element) => {
