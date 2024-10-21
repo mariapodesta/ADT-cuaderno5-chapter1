@@ -213,7 +213,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       }
 
-      
+        
       
       // Fetch translations and set up click handlers for elements with data-id
       await fetchTranslations();
