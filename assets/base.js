@@ -164,62 +164,51 @@ document.addEventListener("DOMContentLoaded", function () {
         navToggle.addEventListener("click", toggleNav);
       }
 
-      if (navLinks) {
-        navLinks.forEach((link) => {
-          link.addEventListener("click", () => {
-            // Add your logic for nav link click here
-          });
-        });
-      }
-
-      // Append page and section numbers to nav list items
-      const navListItems = document.querySelectorAll(".nav__list-item");
-
-      navListItems.forEach((item) => {
-        const link = item.querySelector(".nav__list-link");
-        const href = link.getAttribute("href");
-        const pageSectionMatch = href.match(/(\d+)_(\d+)/);
-
-        if (pageSectionMatch) {
-          const [_, pageNumber, sectionNumber] = pageSectionMatch.map(Number);
-          link.innerText = `Page ${pageNumber + 1}.${sectionNumber + 1}: ${link.innerText}`;
-        }
-      });
-
-      // Set the initial page number
-      const pageSectionMetaTag = document.querySelector('meta[name="page-section-id"]');
-      const pageSectionContent = pageSectionMetaTag.getAttribute("content");
-
-      if (pageSectionContent) {
-        const parts = pageSectionContent.split('_').map(Number);
-        const humanReadablePage = parts.length === 2 
-          ? `Page ${parts[0] + 1}.${parts[1] + 1}` 
-          : `Page ${parts[0] + 1}`;
-        
-        document.getElementById("page-section-id").innerText = humanReadablePage;
-
-        // Highlight the current page in the navigation menu
-        navListItems.forEach((item) => {
-          const link = item.querySelector(".nav__list-link");
-          const href = link.getAttribute("href");
-          if (href.includes(pageSectionContent)) {
-            item.classList.add("border-l-4", "border-blue-500", "bg-blue-100", "p-2");
-            link.classList.add("text-black");
-          } else {
-            item.classList.remove("border-l-4", "border-blue-500", "bg-blue-100", "p-2");
-            link.classList.remove("text-black");
-            link.classList.add("text-black");
-          }
-        });
-      }
-
-        
+      
       
       // Fetch translations and set up click handlers for elements with data-id
       await fetchTranslations();
       document.querySelectorAll("[data-id]").forEach((element) => {
         element.addEventListener("click", handleElementClick);
       });
+
+      // Append page and section numbers to nav list items
+      const navListItems = document.querySelectorAll(".nav__list-item");
+
+      navListItems.forEach((item, index) => {
+        const link = item.querySelector(".nav__list-link");
+        item.classList.add("border-b", "border-gray-300", "pt-2", "pb-2");
+      
+        // Add border top to the first element
+        if (index === 0) {
+          item.classList.add("border-t", "border-gray-300");
+        }
+        item.classList.add("flex", "items-center");
+        const href = link.getAttribute("href");
+        const pageSectionMatch = href.match(/(\d+)_(\d+)/);
+
+        if (pageSectionMatch) {
+          const [_, pageNumber, sectionNumber] = pageSectionMatch.map(Number);
+          link.innerText = translateText("page") + " " + `${pageNumber + 1}.${sectionNumber + 1}: ${link.innerText}`;
+        }
+      
+        if ("/" + href === window.location.pathname) {
+          item.classList.add("p-2", "min-h-[3rem]");
+          link.classList.add("border-l-4", "border-blue-500", "bg-blue-100", "p-2");
+        }
+      });
+
+      // Set the initial page number
+      const pageSectionMetaTag = document.querySelector('meta[name="page-section-id"]');
+      const pageSectionContent = pageSectionMetaTag.getAttribute("content");
+      if (pageSectionContent) {
+        const parts = pageSectionContent.split('_').map(Number);
+        const humanReadablePage = parts.length === 2 
+          ? translateText("page") + " " + `${parts[0] + 1}.${parts[1] + 1}` 
+          : translateText("page") + " " + `${parts[0] + 1}`;
+        
+        document.getElementById("page-section-id").innerText = humanReadablePage;
+      } 
 
       // Add keyboard event listeners for navigation
       document.addEventListener("keydown", handleKeyboardShortcuts);
@@ -448,6 +437,13 @@ function applyTranslations() {
   }
   // Gather the audio elements again based on the current mode (easy-read or normal)
   gatherAudioElements();
+}
+
+function translateText(textToTranslate, variables = {}) {
+  var newText = translations[textToTranslate];
+  if (!newText) return textToTranslate; // Return the original text if no translation is found
+
+  return newText.replace(/\${(.*?)}/g, (match, p1) => variables[p1] || "");
 }
 
 // Audio functionality
