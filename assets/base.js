@@ -219,16 +219,22 @@ document.addEventListener("DOMContentLoaded", function () {
       const pageSectionContent = pageSectionMetaTag.getAttribute("content");
       if (pageSectionContent) {
         const parts = pageSectionContent.split("_").map(Number);
-        const humanReadablePage =
-          parts.length === 2
-            ? "<span data-id='page'></span> " +
-              `${parts[0] + 1}.${parts[1] + 1}`
-            : "<span data-id='page'></span> " + `${parts[0] + 1}`;
+        let humanReadablePage;
+      
+        if (parts.length === 2) {
+          if (parts[1] === 0) {
+            humanReadablePage = "<span data-id='page'></span> " + `${parts[0] + 1}`;
+          } else {
+            humanReadablePage = "<span data-id='page'></span> " + `${parts[0] + 1}.${parts[1] + 1}`;
+          }
+        } else {
+          humanReadablePage = "<span data-id='page'></span> " + ` ${parts[0] + 1}`;
+        }
 
         document.getElementById("page-section-id").innerHTML =
           humanReadablePage;
       }
-
+    
       // Fetch translations and set up click handlers for elements with data-id
       await fetchTranslations();
       document.querySelectorAll("[data-id]").forEach((element) => {
@@ -257,6 +263,9 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("Error loading HTML:", error);
     });
 });
+
+
+
 
 // Handle keyboard events for navigation
 function handleKeyboardShortcuts(event) {

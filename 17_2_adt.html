@@ -30,33 +30,9 @@
 <div>
 <h2 aria-label="Categoría Ciencias Naturales" class="text-lg font-semibold mb-2 text-green-700" data-aria-id="aria-17-2-2">Ciencias Naturales</h2>
 <div class="min-h-48 bg-green-50 p-4 rounded-lg border border-gray-300">
-<div aria-label="Lista de Ciencias Naturales" class="category p-2" data-activity-category="naturales" data-aria-id="aria-17-2-3">
+<div aria-label="Lista de Ciencias Naturales" class="category p-2 min-h-40" data-activity-category="naturales" data-aria-id="aria-17-2-3">
 <ul class="word-list space-y-2">
-<li class="word-card bg-white p-2 rounded-lg shadow-sm" tabindex="0">
-<div aria-label="Química" class="word clearfix" data-activity-item="item-2" data-aria-id="aria-17-2-4" data-id="text-17-23">
-                                        química
-                                    </div>
-</li>
-<li class="word-card bg-white p-2 rounded-lg shadow-sm" tabindex="0">
-<div aria-label="Astronomía" class="word clearfix" data-activity-item="item-4" data-aria-id="aria-17-2-5" data-id="text-17-25">
-                                        astronomía
-                                    </div>
-</li>
-<li class="word-card bg-white p-2 rounded-lg shadow-sm" tabindex="0">
-<div aria-label="Física" class="word clearfix" data-activity-item="item-5" data-aria-id="aria-17-2-6" data-id="text-17-26">
-                                        física
-                                    </div>
-</li>
-<li class="word-card bg-white p-2 rounded-lg shadow-sm" tabindex="0">
-<div aria-label="Biología" class="word clearfix" data-activity-item="item-6" data-aria-id="aria-17-2-7" data-id="text-17-27">
-                                        biología
-                                    </div>
-</li>
-<li class="word-card bg-white p-2 rounded-lg shadow-sm" tabindex="0">
-<div aria-label="Geología" class="word clearfix" data-activity-item="item-7" data-aria-id="aria-17-2-8" data-id="text-17-28">
-                                        geología
-                                    </div>
-</li>
+<!-- Empty initially -->
 </ul>
 </div>
 </div>
@@ -64,23 +40,54 @@
 <div>
 <h2 aria-label="Categoría Ciencias Sociales" class="text-lg font-semibold mb-2 text-blue-500" data-aria-id="aria-17-2-9">Ciencias Sociales</h2>
 <div class="min-h-48 bg-blue-50 p-4 rounded-lg border border-gray-300">
-<div aria-label="Lista de Ciencias Sociales" class="category p-2" data-activity-category="sociales" data-aria-id="aria-17-2-10">
+<div aria-label="Lista de Ciencias Sociales" class="category p-2 min-h-40" data-activity-category="sociales" data-aria-id="aria-17-2-10">
 <ul class="word-list space-y-2">
-<li class="word-card bg-white p-2 rounded-lg shadow-sm" tabindex="0">
-<div aria-label="Geografía" class="word clearfix" data-activity-item="item-1" data-aria-id="aria-17-2-11" data-id="text-17-22">
-                                        geografía
-                                    </div>
-</li>
-<li class="word-card bg-white p-2 rounded-lg shadow-sm" tabindex="0">
-<div aria-label="Historia" class="word clearfix" data-activity-item="item-3" data-aria-id="aria-17-2-12" data-id="text-17-24">
-                                        historia
-                                    </div>
-</li>
+<!-- Empty initially -->
 </ul>
 </div>
 </div>
 </div>
 </div>
+
+<!-- Draggable Items -->
+<div class="flex flex-wrap gap-4 mt-6">
+  <!-- Word Card: Geografía -->
+  <p class="word-card border border-gray-300 p-2 rounded-md shadow bg-white hover:bg-gray-100" data-activity-item="item-1" aria-label="Geografía" data-aria-id="aria-17-2-11" draggable="true" tabindex="0">
+    <img src="images/17_img-17-3.png" alt="Placeholder image for geografía" class="w-full h-auto mb-2"/>
+    <span class="word-text" data-id="text-17-22">geografía</span>
+  </p>
+  <!-- Word Card: Química -->
+  <p class="word-card border border-gray-300 p-2 rounded-md shadow bg-white hover:bg-gray-100" data-activity-item="item-2" aria-label="Química" data-aria-id="aria-17-2-4" draggable="true" tabindex="0">
+    <img src="images/17_img-17-17.png" alt="Placeholder image for química" class="w-full h-auto mb-2"/>
+    <span class="word-text" data-id="text-17-23">química</span>
+  </p>
+  <!-- Word Card: Historia -->
+  <p class="word-card border border-gray-300 p-2 rounded-md shadow bg-white hover:bg-gray-100" data-activity-item="item-3" aria-label="Historia" data-aria-id="aria-17-2-12" draggable="true" tabindex="0">
+    <img src="images/17_img-17-4.png" alt="Placeholder image for historia" class="w-full h-auto mb-2"/>
+    <span class="word-text" data-id="text-17-24">historia</span>
+  </p>
+  <!-- Word Card: Astronomía -->
+  <p class="word-card border border-gray-300 p-2 rounded-md shadow bg-white hover:bg-gray-100" data-activity-item="item-4" aria-label="Astronomía" data-aria-id="aria-17-2-5" draggable="true" tabindex="0">
+    <img src="images/17_img-17-8.png" alt="Placeholder image for astronomía" class="w-full h-auto mb-2"/>
+    <span class="word-text" data-id="text-17-25">>astronomía</span>
+  </p>
+  <!-- Word Card: Física -->
+  <p class="word-card border border-gray-300 p-2 rounded-md shadow bg-white hover:bg-gray-100" data-activity-item="item-5" aria-label="Física" data-aria-id="aria-17-2-6" draggable="true" tabindex="0">
+    <img src="images/17_img-17-6.png" alt="Placeholder image for física" class="w-full h-auto mb-2"/>
+    <span class="word-text" data-id="text-17-26">física</span>
+  </p>
+  <!-- Word Card: Biología -->
+  <p class="word-card border border-gray-300 p-2 rounded-md shadow bg-white hover:bg-gray-100" data-activity-item="item-6" aria-label="Biología" data-aria-id="aria-17-2-7" draggable="true" tabindex="0">
+    <img src="images/17_img-17-7.png" alt="Placeholder image for biología" class="w-full h-auto mb-2"/>
+    <span class="word-text" data-id="text-17-27">biología</span>
+  </p>
+  <!-- Word Card: Geología -->
+  <p class="word-card border border-gray-300 p-2 rounded-md shadow bg-white hover:bg-gray-100" data-activity-item="item-7" aria-label="Geología" data-aria-id="aria-17-2-8" draggable="true" tabindex="0">
+    <img src="images/17_img-17-5.png" alt="Placeholder image for geología" class="w-full h-auto mb-2"/>
+    <span class="word-text" data-id="text-17-28">geología</span>
+  </p>
+</div>
+
 </section>
 <div id="feedback"></div>
 </main>
@@ -94,7 +101,7 @@ const correctAnswers =
     'item-7': 'naturales', 
     'item-1': 'sociales', 
     'item-3': 'sociales'
-    }
+}
 </script>
 <script src="assets/base.js"></script>
 </body>

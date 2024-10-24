@@ -692,7 +692,7 @@ function selectWordSort(wordCard) {
     .forEach((card) => card.classList.remove("border-blue-700"));
   wordCard.classList.add("border-blue-700", "border-2", "box-border");
 
-  currentWord = wordCard.textContent;
+  currentWord = wordCard.getAttribute("data-activity-item");
 
   highlightBoxes(true);
 }
@@ -718,28 +718,41 @@ function placeWord(category) {
     return;
   }
 
-  const listItem = document.createElement("li");
-  listItem.textContent = currentWord;
-  listItem.className = "bg-gray-200 p-2 m-1 rounded word-card";
-  listItem.setAttribute("data-activity-category", category);
-  listItem.addEventListener("click", () => removeWord(listItem));
-  listElement.appendChild(listItem);
-
-  // Find the word card and apply styles
-  const wordCard = Array.from(document.querySelectorAll(".word-card")).find(
-    (card) => card.textContent === currentWord
+  // Find the word card and get the wordKey
+  const wordCard = document.querySelector(
+    `.word-card[data-activity-item="${currentWord}"]`
   );
-  if (wordCard) {
-    wordCard.classList.add(
-      "bg-gray-300",
-      "cursor-not-allowed",
-      "text-gray-400",
-      "hover:bg-gray-300",
-      "hover:scale-100"
-    );
-    wordCard.style.border = "none";
-    wordCard.classList.remove("selected", "shadow-lg");
+  if (!wordCard) {
+    console.error(`Word card for "${currentWord}" not found.`);
+    return;
   }
+
+  //const wordKey = wordCard.getAttribute("data-activity-item");
+
+  // Clone the word card to include the image
+  const clonedWordCard = wordCard.cloneNode(true);
+  clonedWordCard.classList.remove("border-blue-700", "border-2", "box-border");
+  clonedWordCard.classList.add("placed-word", "max-w-40", "m-2", "p-2");
+  clonedWordCard.addEventListener("click", () => removeWord(clonedWordCard));
+
+  // Ensure the container uses flexbox
+  listElement.classList.add("flex", "flex-wrap");
+
+  // Append the cloned card to the category's word list
+  listElement.appendChild(clonedWordCard);
+
+  // Apply styles to the word card
+  wordCard.classList.add(
+    "bg-gray-300",
+    "cursor-not-allowed",
+    "text-gray-400",
+    "hover:bg-gray-300",
+    "hover:scale-100"
+  );
+  wordCard.style.border = "none";
+  wordCard.classList.remove("selected", "shadow-lg");  
+  wordCard.removeEventListener("click", () => selectWordSort(wordCard));
+
 
   currentWord = "";
   highlightBoxes(false);
