@@ -192,12 +192,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (pageSectionContent) {
         const parts = pageSectionContent.split('_').map(Number);
-        const humanReadablePage = parts.length === 2 
-          ? `Page ${parts[0] + 1}.${parts[1] + 1}` 
-          : `Page ${parts[0] + 1}`;
-        
+        let humanReadablePage;
+      
+        if (parts.length === 2) {
+          if (parts[1] === 0) {
+            humanReadablePage = `Page ${parts[0] + 1}`;
+          } else {
+            humanReadablePage = `Page ${parts[0] + 1}.${parts[1] + 1}`;
+          }
+        } else {
+          humanReadablePage = `Page ${parts[0] + 1}`;
+        }
+      
         document.getElementById("page-section-id").innerText = humanReadablePage;
-
+      
         // Highlight the current page in the navigation menu
         navListItems.forEach((item) => {
           const link = item.querySelector(".nav__list-link");
@@ -212,8 +220,6 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         });
       }
-
-        
       
       // Fetch translations and set up click handlers for elements with data-id
       await fetchTranslations();
@@ -243,6 +249,9 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("Error loading HTML:", error);
     });
 });
+
+
+
 
 // Handle keyboard events for navigation
 function handleKeyboardShortcuts(event) {
