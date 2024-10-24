@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", function () {
             `${pageNumber + 1}.${sectionNumber + 1}: ${link.innerText}` + "</span></div>";
         }
 
-        if ("/" + href === window.location.pathname) {
+        if (href === window.location.pathname.split('/').pop()) {
           item.classList.add("min-h-[3rem]");
           link.classList.add(
             "border-l-4",
