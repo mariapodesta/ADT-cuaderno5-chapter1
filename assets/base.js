@@ -164,51 +164,76 @@ document.addEventListener("DOMContentLoaded", function () {
         navToggle.addEventListener("click", toggleNav);
       }
 
-      
-      
-      // Fetch translations and set up click handlers for elements with data-id
-      await fetchTranslations();
-      document.querySelectorAll("[data-id]").forEach((element) => {
-        element.addEventListener("click", handleElementClick);
-      });
-
       // Append page and section numbers to nav list items
       const navListItems = document.querySelectorAll(".nav__list-item");
 
       navListItems.forEach((item, index) => {
         const link = item.querySelector(".nav__list-link");
-        item.classList.add("border-b", "border-gray-300", "pt-2", "pb-2");
-      
+        item.classList.add(
+          "border-b",
+          "border-gray-300",
+          "pt-2",
+          "pb-2",
+          "flex",
+          "items-center"
+        );
+        link.classList.add(
+          "flex-grow",
+          "flex",
+          "items-center",
+          "w-full",
+          "h-full",
+          "space-x-2"
+        );
+
         // Add border top to the first element
         if (index === 0) {
-          item.classList.add("border-t", "border-gray-300");
+          item.classList.add("border-t");
         }
-        item.classList.add("flex", "items-center");
+
         const href = link.getAttribute("href");
         const pageSectionMatch = href.match(/(\d+)_(\d+)/);
 
         if (pageSectionMatch) {
           const [_, pageNumber, sectionNumber] = pageSectionMatch.map(Number);
-          link.innerText = translateText("page") + " " + `${pageNumber + 1}.${sectionNumber + 1}: ${link.innerText}`;
+          link.innerHTML =
+            "<div class='whitespace-normal'><span class='inline' data-id='page'></span><span class='inline'> " +
+            `${pageNumber + 1}.${sectionNumber + 1}: ${link.innerText}` + "</span></div>";
         }
-      
+
         if ("/" + href === window.location.pathname) {
-          item.classList.add("p-2", "min-h-[3rem]");
-          link.classList.add("border-l-4", "border-blue-500", "bg-blue-100", "p-2");
+          item.classList.add("min-h-[3rem]");
+          link.classList.add(
+            "border-l-4",
+            "border-blue-500",
+            "bg-blue-100",
+            "p-2"
+          );
         }
       });
 
       // Set the initial page number
-      const pageSectionMetaTag = document.querySelector('meta[name="page-section-id"]');
+      const pageSectionMetaTag = document.querySelector(
+        'meta[name="page-section-id"]'
+      );
       const pageSectionContent = pageSectionMetaTag.getAttribute("content");
       if (pageSectionContent) {
-        const parts = pageSectionContent.split('_').map(Number);
-        const humanReadablePage = parts.length === 2 
-          ? translateText("page") + " " + `${parts[0] + 1}.${parts[1] + 1}` 
-          : translateText("page") + " " + `${parts[0] + 1}`;
-        
-        document.getElementById("page-section-id").innerText = humanReadablePage;
-      } 
+        const parts = pageSectionContent.split("_").map(Number);
+        const humanReadablePage =
+          parts.length === 2
+            ? "<span data-id='page'></span> " +
+              `${parts[0] + 1}.${parts[1] + 1}`
+            : "<span data-id='page'></span> " + `${parts[0] + 1}`;
+
+        document.getElementById("page-section-id").innerHTML =
+          humanReadablePage;
+      }
+
+      // Fetch translations and set up click handlers for elements with data-id
+      await fetchTranslations();
+      document.querySelectorAll("[data-id]").forEach((element) => {
+        element.addEventListener("click", handleElementClick);
+      });
 
       // Add keyboard event listeners for navigation
       document.addEventListener("keydown", handleKeyboardShortcuts);
@@ -420,14 +445,16 @@ function applyTranslations() {
       }
     }
 
-    const element = document.querySelector(`[data-id="${key}"]`);
-    if (element) {
-      if (element.tagName === "IMG") {
-        element.setAttribute("alt", translations[translationKey]); // Set the alt text for images
-      } else {
-        element.textContent = translations[translationKey]; // Set the text content for other elements
+    const elements = document.querySelectorAll(`[data-id="${key}"]`);
+    elements.forEach((element) => {
+      if (element) {
+        if (element.tagName === "IMG") {
+          element.setAttribute("alt", translations[translationKey]); // Set the alt text for images
+        } else {
+          element.textContent = translations[translationKey]; // Set the text content for other elements
+        }
       }
-    }
+    });
   }
 
   if (isPlaying) {
@@ -868,6 +895,7 @@ function toggleNav() {
     "aria-hidden",
     navPopup.classList.contains("-translate-x-full") ? "true" : "false"
   );
+  navPopup.classList.toggle("left-2");
 }
 
 // Next and previous pages
