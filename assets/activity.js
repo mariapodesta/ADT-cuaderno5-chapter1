@@ -83,6 +83,24 @@ function prepareMultipleChoiceActivity(section) {
 let selectedButton = null;
 
 function prepareTrueFalseActivity(section) {
+  // Select all radio inputs within the section
+  const buttons = section.querySelectorAll("input[type='radio']");
+  
+  // Add event listeners to each radio button
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      // Set the clicked button as the selectedButton
+      selectedButton = button;
+      
+      // Optional: Visually indicate the selection by toggling classes
+      //buttons.forEach(btn => btn.parentElement.classList.remove("selected"));
+      //button.parentElement.classList.add("selected");
+    });
+  });
+}
+
+/*
+function prepareTrueFalseActivity(section) {
   //Select all elements with the button class. These are radio button input elements for accessbility purposes.
   const buttons = section.querySelectorAll(".button");
   buttons.forEach((button) => {
@@ -91,6 +109,7 @@ function prepareTrueFalseActivity(section) {
     };
   });
 }
+*/
 
 function checkTrueFalse() {
   // Uncomment to add a no selection error message when the user hits submit.
@@ -102,6 +121,12 @@ function checkTrueFalse() {
   //   noSelectionMessage.classList.remove("hidden");
   //   return;
   // }
+
+    // Show error if no selection is made
+    if (!selectedButton) {
+      return;
+    } 
+    
 
   const dataActivityItem = selectedButton.getAttribute("data-activity-item");
   const isCorrect = correctAnswers[dataActivityItem];

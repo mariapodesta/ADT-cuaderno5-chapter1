@@ -19,17 +19,19 @@
 <p class="mb-4 text-lg"><i class="fas fa-info-circle text-green-700"></i> <span data-id="text-18-1">Señala la imagen más adecuada para ilustrar la información del recuadro «Biomas del mundo».</span></p>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 <div class="border p-4 rounded-lg shadow">
+<div class="questions" role="group" aria-labelledby="question-label">
 <img alt="Diagrama que muestra la condensación y la dirección de los vientos cálidos, resultando en bosques húmedos y lluvia de un lado de la montaña, mientras que el otro lado es seco con vegetación de zonas áridas." aria-label="Diagrama que muestra la condensación y la dirección de los vientos cálidos, resultando en bosques húmedos y lluvia de un lado de la montaña, mientras que el otro lado es seco con vegetación de zonas áridas." class="w-full mb-2" data-aria-id="aria-18-0-0" data-id="img-18-2" src="images/18_img-18-2.png"/>
-<div class="flex justify-between">
+<label  class="activity-option flex items-center">
+<input aria-label="Seleccionar opción A" class="mr-4" data-aria-id="aria-18-0-1" id="optionA" name="choice" tabindex="0" type="radio" value="A" data-activity-item="item-1"/>
 <span data-id="text-18-2">A</span>
-<input aria-label="Seleccionar opción A" class="mr-4" data-aria-id="aria-18-0-1" id="optionA" name="choice" tabindex="0" type="radio" value="A"/>
-</div>
-</div>
+</label>
 <div class="border p-4 rounded-lg shadow">
 <img alt="Ilustración de un paisaje montañoso mostrando la cima, ladera, pie y valle." aria-label="Ilustración de un paisaje montañoso mostrando la cima, ladera, pie y valle." class="w-full mb-2" data-aria-id="aria-18-0-2" data-id="img-18-1" src="images/18_img-18-1.png"/>
-<div class="flex justify-between">
+<label  class="activity-option flex items-center">
+<input aria-label="Seleccionar opción B" class="mr-4" data-aria-id="aria-18-0-3" id="optionB" name="choice" tabindex="0" type="radio" value="B" data-activity-item="item-2"/>
 <span data-id="text-18-10">B</span>
-<input aria-label="Seleccionar opción B" class="mr-4" data-aria-id="aria-18-0-3" id="optionB" name="choice" tabindex="0" type="radio" value="B"/>
+</label>
+</div>
 </div>
 </div>
 </div>
@@ -50,5 +52,14 @@
 </main>
 
 <script src="assets/base.js"></script>
+
+<script>
+    const correctAnswers = {
+            "item-1": true,
+            "item-2": false
+        };
+
+    </script>
+
 </body>
 </html>
