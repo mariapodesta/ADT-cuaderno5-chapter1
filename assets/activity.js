@@ -315,9 +315,9 @@ function provideFeedback(element, isCorrect, _correctAnswer, activityType) {
   ) {
     if (isCorrect) {
       feedback.classList.add("bg-green-200", "text-green-700");
-      feedback.innerText = "Well done!";
+      feedback.innerText = translateText("well-done");
     } else {
-      feedback.innerText = "Try Again";
+      feedback.innerText = translateText("fill-in-the-blank-try-again");
       feedback.classList.add("bg-red-200", "text-red-700");
     }
   }
@@ -346,7 +346,7 @@ function provideFeedback(element, isCorrect, _correctAnswer, activityType) {
 
         // If the answer is correct, provide a positive feedback message and mark
         if (isCorrect) {
-          feedback.innerText = "Great job! Your answer is correct.";
+          feedback.innerText = translateText("multiple-choice-correct-answer");
           feedback.classList.add("bg-green-200", "text-green-700");
           mark.classList.add("mark", "tick");
           mark.innerText = "✔️"; // or use a check mark icon
@@ -355,7 +355,7 @@ function provideFeedback(element, isCorrect, _correctAnswer, activityType) {
         } else {
           // If the answer is incorrect, provide negative feedback and mark
           feedback.classList.add("bg-red-200", "text-red-700");
-          feedback.innerText = "Try Again";
+          feedback.innerText = translateText("multiple-choice-try-again");
           mark.classList.add("mark", "cross");
           mark.innerText = "❌"; // or use a cross mark icon
           associatedLabel.prepend(mark); // Add cross to the start of the span
@@ -424,7 +424,7 @@ function checkMultipleChoice() {
 
   updateSubmitButtonAndToast(
     isCorrect,
-    "Next Activity",
+    translateText("next-activity"),
     ActivityTypes.MULTIPLE_CHOICE
   );
 }
@@ -516,7 +516,7 @@ function checkFillInTheBlank() {
 
   updateSubmitButtonAndToast(
     allCorrect,
-    "Next Activity",
+    translateText("next-activity"),
     ActivityTypes.FILL_IN_THE_BLANK,
     unfilledCount
   );
@@ -533,7 +533,7 @@ function checkTextInputs() {
 
   updateSubmitButtonAndToast(
     allFilled,
-    "Next Activity",
+    translateText("next-activity"),
     ActivityTypes.OPEN_ENDED_ANSWER,
     unfilledCount
   );
@@ -550,7 +550,7 @@ function checkTableInputs() {
 
   updateSubmitButtonAndToast(
     allFilled,
-    "Next Activity",
+    translateText("next-activity"),
     ActivityTypes.FILL_IN_A_TABLE,
     unfilledCount
   );
@@ -558,7 +558,7 @@ function checkTableInputs() {
 
 function updateSubmitButtonAndToast(
   isCorrect,
-  buttonText = "Next Activity",
+  buttonText = translateText("next-activity"),
   activityType,
   unfilledCount = 0 // default value to maintain compatibility
 ) {
@@ -580,15 +580,15 @@ function updateSubmitButtonAndToast(
         activityType === ActivityTypes.OPEN_ENDED_ANSWER ||
         activityType === ActivityTypes.FILL_IN_A_TABLE
       ) {
-        toast.textContent = "Your answers have been submitted!";
+        toast.textContent = translateText("answers-submitted");
       } else {
-        toast.textContent = "Great job! Your answer is correct.";
+        toast.textContent = translateText("correct-answer");
       }
     }
 
-    if (buttonText === "Next Activity") {
+    if (buttonText === translateText("next-activity")) {
       submitButton.addEventListener("click", nextPage); // Add the new click handler
-      submitButton.setAttribute("aria-label", "Next Activity");
+      submitButton.setAttribute("aria-label", translateText("next-activity"));
     }
 
     // Hide the Toast after 3 seconds
@@ -598,15 +598,15 @@ function updateSubmitButtonAndToast(
   } else {
     if (activityType === ActivityTypes.MULTIPLE_CHOICE) {
       // Show Retry button only for multiple-choice
-      submitButton.textContent = "Retry"; // Change button text to Retry
-      submitButton.setAttribute("aria-label", "Retry"); // Add an aria-label for screen readers
+      submitButton.textContent = translateText("retry"); // Change button text to Retry
+      submitButton.setAttribute("aria-label", translateText("retry")); // Add an aria-label for screen readers
 
       retryHandler = retryActivity; // Assign the retry activity to retryHandler
       submitButton.addEventListener("click", retryHandler); // Use retryHandler to manage the retry click
     } else {
       // For non-multiple-choice activities, keep the submit button
-      submitButton.textContent = "Submit"; // Keep the Submit button text
-      submitButton.setAttribute("aria-label", "Submit");
+      submitButton.textContent = translateText("submit-text"); // Keep the Submit button text
+      submitButton.setAttribute("aria-label", translateText("submit-text"));
       submitButton.addEventListener("click", validateHandler);
     }
 
@@ -621,16 +621,20 @@ function updateSubmitButtonAndToast(
       activityType === ActivityTypes.FILL_IN_A_TABLE
     ) {
       if (unfilledCount > 0) {
-        toast.textContent = `Please fill all fields. ${unfilledCount} blank left.`;
+        toast.textContent = translateText("fill-in-the-blank-not-complete", {
+          unfilledCount: unfilledCount,
+        });
       } else if (
         unfilledCount == 0 &&
         !isCorrect &&
         activityType === ActivityTypes.FILL_IN_THE_BLANK
       ) {
-        toast.textContent = "Please correct your answers.";
+        toast.textContent = translateText(
+          "fill-in-the-blank-correct-the-answers"
+        );
       }
     } else {
-      toast.textContent = "Try Again.";
+      toast.textContent = translateText("fill-in-the-blank-try-again");
     }
 
     // Hide the Toast after 3 seconds
@@ -666,8 +670,8 @@ function retryActivity() {
   const submitButton = document.getElementById("submit-button");
 
   if (submitButton) {
-    submitButton.textContent = "Submit";
-    submitButton.setAttribute("aria-label", "Submit"); // Add an aria-label for screen readers
+    submitButton.textContent = translateText("submit-text");
+    submitButton.setAttribute("aria-label", translateText("submit-text")); // Add an aria-label for screen readers
 
     // Remove any lingering event listeners
     submitButton.removeEventListener("click", retryHandler);
@@ -1089,13 +1093,14 @@ function checkSorting() {
   const feedbackMessage = `You have ${correctCount} correct answers and ${incorrectCount} incorrect answers.${allCorrect ? ' Great job!' : ' Try again!'}`;
   console.log("Feedback:", feedbackMessage);
   feedbackElement.textContent = feedbackMessage;
+
   feedbackElement.classList.remove("text-red-500", "text-green-500");
   feedbackElement.classList.add(allCorrect ? "text-green-500" : "text-red-500");
 
   // Update the submit button and toast
   updateSubmitButtonAndToast(
     allCorrect,
-    allCorrect ? "Next Activity" : "Retry",
+    allCorrect ? translateText("next-activity") : translateText("retry"),
     ActivityTypes.SORTING
   );
 }
@@ -1414,11 +1419,13 @@ function checkMatching() {
   // Update feedback
   const feedback = document.getElementById("feedback");
   if (correctCount === Object.keys(correctAnswers).length) {
-    feedback.textContent = "All answers are correct!";
+    feedback.textContent = translateText("matching-correct-answers");
     feedback.classList.remove("text-red-500");
     feedback.classList.add("text-green-500");
   } else {
-    feedback.textContent = `You have ${correctCount} correct answers. Try again.`;
+    feedback.textContent = translateText("matching-correct-answers-count", {
+      correctCount: correctCount,
+    });
     feedback.classList.remove("text-green-500");
     feedback.classList.add("text-red-500");
   }
