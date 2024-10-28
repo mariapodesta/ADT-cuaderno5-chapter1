@@ -24,14 +24,14 @@
             <img alt="Diagrama que muestra la condensación y la dirección de los vientos cálidos, resultando en bosques húmedos y lluvia de un lado de la montaña, mientras que el otro lado es seco con vegetación de zonas áridas." aria-label="Diagrama que muestra la condensación y la dirección de los vientos cálidos, resultando en bosques húmedos y lluvia de un lado de la montaña, mientras que el otro lado es seco con vegetación de zonas áridas." class="w-full mb-2" data-aria-id="aria-18-0-0" data-id="img-18-2" src="images/18_img-18-2.png"/>
                 <div class="flex justify-between text-3xl">
                     <span data-id="text-18-2">A</span>
-                    <input aria-label="Seleccionar opción A" class="mr-4" data-aria-id="aria-18-0-1" id="optionA" name="choice" tabindex="0" type="radio" value="A"/>
+                    <input aria-label="Seleccionar opción A" class="mr-4" data-activity-item="option-A" data-aria-id="aria-18-0-1" id="option-A" name="choice" tabindex="0" type="radio" value="A"/>
                 </div>
             </div>
             <div class="border p-4 rounded-lg shadow">
             <img alt="Ilustración de un paisaje montañoso mostrando la cima, ladera, pie y valle." aria-label="Ilustración de un paisaje montañoso mostrando la cima, ladera, pie y valle." class="w-full mb-2" data-aria-id="aria-18-0-2" data-id="img-18-1" src="images/18_img-18-1.png"/>
                 <div class="flex justify-between text-3xl">
                     <span data-id="text-18-10">B</span>
-                    <input aria-label="Seleccionar opción B" class="mr-4" data-aria-id="aria-18-0-3" id="optionB" name="choice" tabindex="0" type="radio" value="B"/>
+                    <input aria-label="Seleccionar opción B" class="mr-4" data-activity-item="option-B" data-aria-id="aria-18-0-3" id="option-B" name="choice" tabindex="0" type="radio" value="B"/>
                 </div>
             </div>
         </div>
@@ -69,6 +69,12 @@
 </section>
 </main>
 
+<script>
+    const correctAnswers = {
+        'option-A': true,  // or false depending on which is correct
+        'option-B': false  // or true depending on which is correct
+};
+</script>
 <script src="assets/base.js"></script>
 </body>
 </html>
