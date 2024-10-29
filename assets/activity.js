@@ -806,39 +806,25 @@ function selectWordSort(wordCard) {
   highlightBoxes(true);
 }
 
+// Modified placeWord function to handle different card types
 function placeWord(category) {
   if (!currentWord) {
     console.log("No word selected.");
     return;
   }
 
-  console.log("word placed");
-
-  // Play drop sound when word is placed
   playActivitySound('drop');
 
-  // Correct query to target the div with the exact data-activity-category value
   const categoryDiv = document.querySelector(
     `div[data-activity-category="${category}"]`
   );
-  const listElement = categoryDiv
-    ? categoryDiv.querySelector(".word-list")
-    : null;
+  const listElement = categoryDiv?.querySelector(".word-list");
 
   if (!listElement) {
-
-    // CREATE A NEW LIST ELEMENT IF IT DOESN'T EXIST
-    // listElement = document.createElement('div');
-    // listElement.classList.add('word-list', 'flex', 'flex-wrap');
-    // categoryDiv.appendChild(listElement);
-    
-    console.error(
-      `Category "${category}" not found or no word list available.`
-    );
+    console.error(`Category "${category}" not found or no word list available.`);
     return;
   }
 
-  // Find the word card and get the wordKey
   const wordCard = document.querySelector(
     `.word-card[data-activity-item="${currentWord}"]`
   );
@@ -847,12 +833,76 @@ function placeWord(category) {
     return;
   }
 
-  //const wordKey = wordCard.getAttribute("data-activity-item");
-
-  // Clone the word card to include the image
   const clonedWordCard = wordCard.cloneNode(true);
+  
+  // Handle different card types
+  if (clonedWordCard.querySelector('img')) {
+    // Cards with images: Create structured layout
+    const contentContainer = document.createElement('div');
+    contentContainer.classList.add(
+      'content-container',
+      'flex',
+      'flex-col',
+      'items-center',
+      'w-full',
+      'space-y-2'
+    );
 
-  // Make sure the cloned card and its images aren't draggable
+    const textWrapper = document.createElement('div');
+    textWrapper.classList.add(
+      'text-wrapper',
+      'flex',
+      'items-center',
+      'justify-center'
+    );
+
+    // Move content into appropriate containers
+    const image = clonedWordCard.querySelector('img');
+    const text = clonedWordCard.querySelector('.word-text, span:not(.validation-mark)');
+
+    if (image) {
+      contentContainer.appendChild(image);
+    }
+    if (text) {
+      textWrapper.appendChild(text);
+    }
+    contentContainer.appendChild(textWrapper);
+
+    // Clear and add new structure
+    while (clonedWordCard.firstChild) {
+      clonedWordCard.removeChild(clonedWordCard.firstChild);
+    }
+    clonedWordCard.appendChild(contentContainer);
+  } else {
+    // Text-only or text+icon cards: Simpler inline layout
+    const textWrapper = document.createElement('div');
+    textWrapper.classList.add(
+      'text-wrapper',
+      'flex',
+      'items-center',
+      'justify-center',
+      'w-full'
+    );
+
+    // Move all content to wrapper
+    while (clonedWordCard.firstChild) {
+      textWrapper.appendChild(clonedWordCard.firstChild);
+    }
+    clonedWordCard.appendChild(textWrapper);
+  }
+
+  // Common setup for all card types
+  clonedWordCard.classList.remove("border-blue-700", "border-2", "box-border");
+  clonedWordCard.classList.add(
+    'placed-word',
+    'max-w-40',
+    'm-2',
+    'p-2',
+    'cursor-pointer',
+    'hover:bg-gray-100'
+  );
+
+  // Disable dragging
   clonedWordCard.setAttribute('draggable', 'false');
   const clonedImage = clonedWordCard.querySelector('img');
   if (clonedImage) {
@@ -860,40 +910,16 @@ function placeWord(category) {
     clonedImage.style.pointerEvents = 'none';
   }
 
-  // Add the appropriate classes for placed words
-  clonedWordCard.classList.remove("border-blue-700", "border-2", "box-border");
-  clonedWordCard.classList.add(
-    "placed-word", 
-    "max-w-40", 
-    "m-2", 
-    "p-2",
-    "cursor-pointer", // Make it clear it's clickable
-    "hover:bg-gray-100" // Add hover effect
-    // "transition",
-    // "duration-200"
-  );
-
-  // // Add a direct click handler that removes immediately
-  // clonedWordCard.addEventListener("click", function(e) {
-  //   // Only handle removal if we're not in placement mode
-  //   if (!currentWord) {
-  //     e.stopPropagation();
-  //     removeAndRestoreWord(this);
-  //   }
-  // });
-
-  // Simple click handler for removal
+  // Add click handler for removal
   clonedWordCard.addEventListener("click", function() {
     removeWord(this);
   });
 
-  // Ensure the container uses flexbox
+  // Add to category list
   listElement.classList.add("flex", "flex-wrap");
-
-  // Append the cloned card to the category's word list
   listElement.appendChild(clonedWordCard);
 
-  // Apply styles to the word card
+  // Update original word card styling
   wordCard.classList.add(
     "bg-gray-300",
     "cursor-not-allowed",
@@ -902,7 +928,7 @@ function placeWord(category) {
     "hover:scale-100"
   );
   wordCard.style.border = "none";
-  wordCard.classList.remove("selected", "shadow-lg");  
+  wordCard.classList.remove("selected", "shadow-lg");
   wordCard.removeEventListener("click", () => selectWordSort(wordCard));
 
   currentWord = "";
@@ -1011,34 +1037,23 @@ function checkSorting() {
 
   console.log("Starting validation check...");
 
-  // Get all category containers
   const categories = document.querySelectorAll('.category');
-  console.log("Found categories:", categories.length);
   
   categories.forEach(category => {
     const categoryType = category.getAttribute('data-activity-category');
-    console.log("\nChecking category:", categoryType);
-    
-    // Get all placed words in this category
     const placedWords = category.querySelectorAll('.placed-word');
-    console.log(`Found ${placedWords.length} placed words in category ${categoryType}`);
     
     placedWords.forEach(placedWord => {
       const wordKey = placedWord.getAttribute('data-activity-item');
       const correctCategory = correctAnswers[wordKey];
       
-      console.log(`Checking word: "${placedWord.textContent.trim()}"`);
-      console.log(`- Word key: ${wordKey}`);
-      console.log(`- Current category: ${categoryType}`);
-      console.log(`- Correct category: ${correctCategory}`);
-      
-      // Remove any existing marks
+      // Remove any existing validation marks
       const existingMark = placedWord.querySelector('.validation-mark');
       if (existingMark) {
         existingMark.remove();
       }
 
-      // Create validation mark element
+      // Create validation mark
       const mark = document.createElement('span');
       mark.classList.add(
         'validation-mark',
@@ -1047,7 +1062,7 @@ function checkSorting() {
         'items-center',
         'text-lg'
       );
-      
+
       if (categoryType === correctCategory) {
         console.log("✓ CORRECT placement");
         placedWord.classList.remove('bg-red-100', 'border-red-300');
@@ -1064,51 +1079,94 @@ function checkSorting() {
         incorrectCount++;
       }
 
-      // Create a wrapper for the text if it doesn't exist
-      let textWrapper = placedWord.querySelector('.text-wrapper');
-      if (!textWrapper) {
-        textWrapper = document.createElement('div');
-        textWrapper.classList.add('text-wrapper', 'flex', 'items-center', 'justify-between', 'w-full');
-        
-        // Move the original text into the wrapper
-        textWrapper.innerHTML = placedWord.innerHTML;
-        placedWord.innerHTML = '';
-        placedWord.appendChild(textWrapper);
-      }
-      
-      // Add the mark after the text
-      textWrapper.appendChild(mark);
+      // Handle different card layouts based on content
+      if (placedWord.querySelector('img')) {
+        // Cards with images: Create structured layout
+        let contentContainer = placedWord.querySelector('.content-container');
+        if (!contentContainer) {
+          contentContainer = document.createElement('div');
+          contentContainer.classList.add(
+            'content-container',
+            'flex',
+            'flex-col',
+            'items-center',
+            'w-full',
+            'space-y-2'
+          );
+          
+          // Move existing content into container
+          while (placedWord.firstChild) {
+            contentContainer.appendChild(placedWord.firstChild);
+          }
+          placedWord.appendChild(contentContainer);
+        }
 
-      // Add padding to the placed word
+        // Create/update text wrapper
+        let textWrapper = placedWord.querySelector('.text-wrapper');
+        if (!textWrapper) {
+          textWrapper = document.createElement('div');
+          textWrapper.classList.add(
+            'text-wrapper',
+            'flex',
+            'items-center',
+            'justify-center'
+          );
+          
+          // Move the text element into the wrapper
+          const textElement = contentContainer.querySelector('.word-text, span:not(.validation-mark)');
+          if (textElement) {
+            textWrapper.appendChild(textElement);
+          }
+          contentContainer.appendChild(textWrapper);
+        }
+        
+        // Add the mark to the text wrapper
+        textWrapper.appendChild(mark);
+
+      } else {
+        // For text-only or text+icon cards: Simpler inline layout
+        let textWrapper = placedWord.querySelector('.text-wrapper');
+        if (!textWrapper) {
+          textWrapper = document.createElement('div');
+          textWrapper.classList.add(
+            'text-wrapper',
+            'flex',
+            'items-center',
+            'justify-center',
+            'w-full'
+          );
+          
+          // Move all existing content to the wrapper
+          while (placedWord.firstChild) {
+            textWrapper.appendChild(placedWord.firstChild);
+          }
+          placedWord.appendChild(textWrapper);
+        }
+        
+        // Add the mark after the content
+        textWrapper.appendChild(mark);
+      }
+
+      // Ensure proper spacing and layout
       placedWord.classList.add('p-2', 'rounded');
     });
   });
 
-  // Count total placed words
+  // Rest of the validation logic remains the same...
   const totalPlacedWords = document.querySelectorAll('.placed-word').length;
   const totalWords = Object.keys(correctAnswers).length;
-
-  console.log("\nValidation Summary:");
-  console.log(`Total words in correctAnswers: ${totalWords}`);
-  console.log(`Total placed words found: ${totalPlacedWords}`);
-  console.log(`Correct placements: ${correctCount}`);
-  console.log(`Incorrect placements: ${incorrectCount}`);
-
   const allWordsPlaced = totalPlacedWords === totalWords;
   const allCorrect = correctCount === totalWords;
 
   if (!allWordsPlaced) {
     const message = `Please place all words in categories before submitting. (${totalPlacedWords}/${totalWords} words placed)`;
-    console.log("Feedback:", message);
     feedbackElement.textContent = message;
     feedbackElement.classList.remove("text-green-500");
     feedbackElement.classList.add("text-red-500");
-    // Play error sound for incomplete submission
     activityAudio.error.play().catch(err => console.log('Audio play failed:', err));
     return;
   }
 
-  // Play appropriate sound based on results
   if (allCorrect) {
     activityAudio.success.play().catch(err => console.log('Audio play failed:', err));
   } else {
@@ -1116,13 +1174,10 @@ function checkSorting() {
   }
 
   const feedbackMessage = `You have ${correctCount} correct answers and ${incorrectCount} incorrect answers.${allCorrect ? ' Great job!' : ' Try again!'}`;
-  console.log("Feedback:", feedbackMessage);
   feedbackElement.textContent = feedbackMessage;
-
   feedbackElement.classList.remove("text-red-500", "text-green-500");
   feedbackElement.classList.add(allCorrect ? "text-green-500" : "text-red-500");
 
-  // Update the submit button and toast
   updateSubmitButtonAndToast(
     allCorrect,
     allCorrect ? translateText("next-activity") : translateText("retry"),
