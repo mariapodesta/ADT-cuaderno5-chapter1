@@ -111,10 +111,36 @@ function prepareActivity() {
 function prepareMultipleChoiceActivity(section) {
   const activityOptions = section.querySelectorAll(".activity-option");
 
+  // Remove any previous event listeners
   activityOptions.forEach((option) => {
-    option.addEventListener("click", () => {
-      selectInteractiveElement(option);
-    });
+    const newOption = option.cloneNode(true);
+    option.parentNode.replaceChild(newOption, option);
+  });
+
+  // Add new event listeners
+  section.querySelectorAll(".activity-option").forEach((option) => {
+    option.addEventListener("click", () => selectInteractiveElement(option));
+    
+    // Add hover effect classes
+    option.classList.add(
+      'cursor-pointer',
+      'transition-all',
+      'duration-200',
+      'hover:shadow-md'
+    );
+
+    // Ensure option label has proper styling
+    const label = option.querySelector("span");
+    if (label) {
+      label.classList.add(
+        'px-4',
+        'py-2',
+        'rounded-full',
+        'font-medium',
+        'transition-colors',
+        'duration-200'
+      );
+    }
   });
 }
 
@@ -200,52 +226,95 @@ function checkTrueFalse() {
   );
 }
 
+// function selectInteractiveElement(option) {
+//   // Deselect all radio buttons in the same group
+
+//   // Find the parent group of the clicked button
+//   const radioGroup = option.closest('[role="group"]');
+
+//   radioGroup.querySelectorAll(".activity-option").forEach((opt) => {
+//     // Reset any button or div state within the option if they exist
+//     const interactiveElement = opt.querySelector(
+//       "[role='radio'], input[type='radio'], button, div"
+//     );
+//     if (interactiveElement) {
+//       interactiveElement.setAttribute("aria-checked", "false");
+//     }
+
+//     // Remove any feedback
+//     const feedback = opt.querySelector(".feedback");
+//     if (feedback) {
+//       feedback.remove();
+//     }
+
+//     // Select the span element inside the label and update its class
+//     const associatedLabel = opt.querySelector("span");
+//     if (associatedLabel) {
+//       associatedLabel.classList.remove("bg-blue-500", "text-white");
+//       associatedLabel.classList.add("bg-gray-200", "hover:bg-gray-300");
+//     }
+//   });
+
+//   // Select the clicked option's associated label
+//   const associatedLabel = option.querySelector("span");
+//   if (associatedLabel) {
+//     associatedLabel.classList.remove("bg-gray-200", "hover:bg-gray-300");
+//     associatedLabel.classList.add("bg-blue-500", "text-white");
+//   }
+
+//   // Handle selection state for the option
+//   const selectedInteractiveElement = option.querySelector(
+//     "[role='radio'], input[type='radio'], button, div"
+//   );
+//   if (selectedInteractiveElement) {
+//     selectedInteractiveElement.setAttribute("aria-checked", "true");
+//   }
+
+//   // Set the selected option
+//   selectedOption = option;
+// }
+
+// Also update the selectInteractiveElement function to log selection
+
 function selectInteractiveElement(option) {
-  // Deselect all radio buttons in the same group
-
-  // Find the parent group of the clicked button
+  console.log("=== Selecting option ===");
+  console.log("Option selected:", option);
+  console.log("Option data-activity-item:", option.getAttribute("data-activity-item"));
+  
+  // Find the parent group of the clicked option
   const radioGroup = option.closest('[role="group"]');
+  if (!radioGroup) {
+    console.log("No radio group found");
+    return;
+  }
 
+  // Deselect all options in the group
   radioGroup.querySelectorAll(".activity-option").forEach((opt) => {
-    // Reset any button or div state within the option if they exist
-    const interactiveElement = opt.querySelector(
-      "[role='radio'], input[type='radio'], button, div"
-    );
-    if (interactiveElement) {
-      interactiveElement.setAttribute("aria-checked", "false");
+    console.log("Resetting option:", opt);
+    // Reset appearance
+    opt.classList.remove('ring-2', 'ring-blue-500');
+    const label = opt.querySelector("span");
+    if (label) {
+      label.classList.remove('bg-blue-500', 'text-white');
+      label.classList.add('bg-gray-200', 'text-gray-800');
     }
-
-    // Remove any feedback
+    
+    // Remove any previous feedback
     const feedback = opt.querySelector(".feedback");
-    if (feedback) {
-      feedback.remove();
-    }
-
-    // Select the span element inside the label and update its class
-    const associatedLabel = opt.querySelector("span");
-    if (associatedLabel) {
-      associatedLabel.classList.remove("bg-blue-500", "text-white");
-      associatedLabel.classList.add("bg-gray-200", "hover:bg-gray-300");
-    }
+    if (feedback) feedback.remove();
   });
 
-  // Select the clicked option's associated label
-  const associatedLabel = option.querySelector("span");
-  if (associatedLabel) {
-    associatedLabel.classList.remove("bg-gray-200", "hover:bg-gray-300");
-    associatedLabel.classList.add("bg-blue-500", "text-white");
+  // Select the clicked option
+  option.classList.add('ring-2', 'ring-blue-500');
+  const label = option.querySelector("span");
+  if (label) {
+    label.classList.remove('bg-gray-200', 'text-gray-800');
+    label.classList.add('bg-blue-500', 'text-white');
   }
 
-  // Handle selection state for the option
-  const selectedInteractiveElement = option.querySelector(
-    "[role='radio'], input[type='radio'], button, div"
-  );
-  if (selectedInteractiveElement) {
-    selectedInteractiveElement.setAttribute("aria-checked", "true");
-  }
-
-  // Set the selected option
+  // Set selection state
   selectedOption = option;
+  console.log("Selection complete. Current selectedOption:", selectedOption);
 }
 
 function validateInputs(activityType) {
@@ -396,63 +465,89 @@ function provideFeedback(element, isCorrect, _correctAnswer, activityType) {
 }
 
 function checkMultipleChoice() {
-  const noSelectionMessage = document.getElementById(
-    "no-selection-error-message"
-  );
-
-  // Check if any option is selected by querying for activity-option with aria-checked="true"
-  const selectedOption = document.querySelector(
-    '.activity-option [aria-checked="true"]'
-  );
-
+  console.log("=== Starting validation ===");
+  
+  // Check if an option is selected
   if (!selectedOption) {
-    noSelectionMessage.classList.remove("hidden");
+    console.log("No option selected");
+    const noSelectionMessage = document.getElementById("no-selection-error-message");
+    if (noSelectionMessage) {
+      noSelectionMessage.classList.remove("hidden");
+    }
     return;
   }
-
-  //const dataActivityItem = selectedOption.closest('.activity-option').getAttribute("data-activity-item");
-
-  // Find the first child element that is a radio button, button, or div within the selected option
-  const selectedInteractiveElement = selectedOption.closest(
-    '[role="radio"], input[type="radio"], button, div'
-  );
-  let dataActivityItem = null;
-
-  if (selectedInteractiveElement) {
-    dataActivityItem =
-      selectedInteractiveElement.getAttribute("data-activity-item");
-  }
-
+  
+  console.log("Selected option:", selectedOption);
+  console.log("Selected option dataset:", selectedOption.dataset);
+  
+  // Get the data-activity-item value
+  const dataActivityItem = selectedOption.getAttribute("data-activity-item");
+  console.log("data-activity-item value:", dataActivityItem);
+  
+  // Log the correctAnswers object
+  console.log("correctAnswers object:", correctAnswers);
+  
+  // Check if the answer is correct
   const isCorrect = correctAnswers[dataActivityItem];
-  console.log("is correct value ", isCorrect); // Debugging purposes
+  console.log("Is correct?", isCorrect);
 
-  // Remove previous feedback if the correct answer is selected
-  const allFeedbacks = document.querySelectorAll(".feedback");
-  allFeedbacks.forEach((feedback) => feedback.remove());
+  // Remove any existing feedback first
+  document.querySelectorAll(".feedback").forEach(el => {
+    console.log("Removing existing feedback:", el);
+    el.remove();
+  });
 
-  provideFeedback(
-    selectedOption,
-    isCorrect,
-    correctAnswers[dataActivityItem],
-    ActivityTypes.MULTIPLE_CHOICE
+  // Create feedback container
+  const feedbackContainer = document.createElement("div");
+  feedbackContainer.className = `feedback flex items-center justify-center mt-4 ${
+    isCorrect ? 'text-green-600' : 'text-red-600'
+  }`;
+
+  // Create feedback icon
+  const icon = document.createElement("span");
+  icon.className = `
+    flex items-center justify-center
+    w-8 h-8 rounded-full
+    ${isCorrect ? 'bg-green-100' : 'bg-red-100'}
+  `;
+  icon.textContent = isCorrect ? '✓' : '✗';
+
+  // Create feedback message
+  const message = document.createElement("span");
+  message.className = "ml-2 font-medium";
+  message.textContent = isCorrect ? "¡Correcto!" : "Incorrect, try again";
+
+  // Assemble and append feedback
+  feedbackContainer.appendChild(icon);
+  feedbackContainer.appendChild(message);
+  selectedOption.appendChild(feedbackContainer);
+
+  // Update option styling based on correctness
+  selectedOption.classList.add(
+    isCorrect ? 'bg-green-50' : 'bg-red-50',
+    'transition-colors',
+    'duration-200'
   );
 
-  const associatedLabel = selectedOption
-    .closest(".activity-option")
-    .querySelector("span");
-
-  if (isCorrect) {
-    associatedLabel.classList.add("bg-green-600");
-  } else {
-    associatedLabel.classList.add("bg-red-200", "text-black");
-  }
-
+  console.log("Updating submit button and toast with isCorrect:", isCorrect);
+  
+  // Update submit button and toast
   updateSubmitButtonAndToast(
     isCorrect,
     translateText("next-activity"),
     ActivityTypes.MULTIPLE_CHOICE
   );
+
+  // Play appropriate sound
+  if (isCorrect) {
+    playActivitySound('success');
+  } else {
+    playActivitySound('error');
+  }
+  
+  console.log("=== Validation complete ===");
 }
+
 
 /**
  * Counts unfilled inputs and moves focus to the first unfilled one.
