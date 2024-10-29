@@ -728,7 +728,7 @@ function placeWord(category) {
   // Clone the word card to include the image
   const clonedWordCard = wordCard.cloneNode(true);
   clonedWordCard.classList.remove("border-blue-700", "border-2", "box-border");
-  clonedWordCard.classList.add("placed-word", "max-w-40", "m-2", "p-2");
+  clonedWordCard.classList.add("placed-word", "mb-2", "p-2");
   clonedWordCard.addEventListener("click", () => removeWord(clonedWordCard));
 
   // Ensure the container uses flexbox
