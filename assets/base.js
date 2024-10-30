@@ -164,63 +164,82 @@ document.addEventListener("DOMContentLoaded", function () {
         navToggle.addEventListener("click", toggleNav);
       }
 
-      if (navLinks) {
-        navLinks.forEach((link) => {
-          link.addEventListener("click", () => {
-            // Add your logic for nav link click here
-          });
-        });
-      }
-
       // Append page and section numbers to nav list items
       const navListItems = document.querySelectorAll(".nav__list-item");
 
-      navListItems.forEach((item) => {
+      navListItems.forEach((item, index) => {
         const link = item.querySelector(".nav__list-link");
+        item.classList.add(
+          "border-b",
+          "border-gray-300",
+          "pt-2",
+          "pb-2",
+          "flex",
+          "items-center"
+        );
+        link.classList.add(
+          "flex-grow",
+          "flex",
+          "items-center",
+          "w-full",
+          "h-full",
+          "space-x-2"
+        );
+
+        // Add border top to the first element
+        if (index === 0) {
+          item.classList.add("border-t");
+        }
+
         const href = link.getAttribute("href");
         const pageSectionMatch = href.match(/(\d+)_(\d+)/);
 
         if (pageSectionMatch) {
           const [_, pageNumber, sectionNumber] = pageSectionMatch.map(Number);
-          link.innerText = `Page ${pageNumber + 1}.${sectionNumber + 1}: ${link.innerText}`;
+          link.innerHTML =
+            "<div class='whitespace-normal'><span class='inline' data-id='page'></span><span class='inline'> " +
+            `${pageNumber + 1}.${sectionNumber + 1}: ${link.innerText}` +
+            "</span></div>";
+        }
+
+        if (href === window.location.pathname.split("/").pop()) {
+          item.classList.add("min-h-[3rem]");
+          link.classList.add(
+            "border-l-4",
+            "border-blue-500",
+            "bg-blue-100",
+            "p-2"
+          );
         }
       });
 
       // Set the initial page number
-      const pageSectionMetaTag = document.querySelector('meta[name="page-section-id"]');
+      const pageSectionMetaTag = document.querySelector(
+        'meta[name="page-section-id"]'
+      );
       const pageSectionContent = pageSectionMetaTag.getAttribute("content");
-
       if (pageSectionContent) {
-        const parts = pageSectionContent.split('_').map(Number);
+        const parts = pageSectionContent.split("_").map(Number);
         let humanReadablePage;
-      
+
         if (parts.length === 2) {
           if (parts[1] === 0) {
-            humanReadablePage = `Page ${parts[0] + 1}`;
+            humanReadablePage =
+              "<span data-id='page'></span> " + `${parts[0] + 1}`;
           } else {
-            humanReadablePage = `Page ${parts[0] + 1}.${parts[1] + 1}`;
+            humanReadablePage =
+              "<span data-id='page'></span> " +
+              `${parts[0] + 1}.${parts[1] + 1}`;
           }
         } else {
-          humanReadablePage = `Page ${parts[0] + 1}`;
+          humanReadablePage =
+            "<span data-id='page'></span> " + ` ${parts[0] + 1}`;
         }
-      
-        document.getElementById("page-section-id").innerText = humanReadablePage;
-      
-        // Highlight the current page in the navigation menu
-        navListItems.forEach((item) => {
-          const link = item.querySelector(".nav__list-link");
-          const href = link.getAttribute("href");
-          if (href.includes(pageSectionContent)) {
-            item.classList.add("border-l-4", "border-blue-500", "bg-blue-100", "p-2");
-            link.classList.add("text-black");
-          } else {
-            item.classList.remove("border-l-4", "border-blue-500", "bg-blue-100", "p-2");
-            link.classList.remove("text-black");
-            link.classList.add("text-black");
-          }
-        });
+
+        document.getElementById("page-section-id").innerHTML =
+          humanReadablePage;
       }
-      
+
       // Fetch translations and set up click handlers for elements with data-id
       await fetchTranslations();
       document.querySelectorAll("[data-id]").forEach((element) => {
@@ -241,6 +260,48 @@ document.addEventListener("DOMContentLoaded", function () {
         navPopup.classList.remove("hidden");
         document.getElementById("sidebar").classList.remove("hidden");
       }, 100); // Adjust the timeout duration as needed
+
+      // Add click handler specifically for eli5-content area
+      document
+        .getElementById("eli5-content")
+        .addEventListener("click", function () {
+          if (readAloudMode && eli5Mode) {
+            const mainSection = document.querySelector(
+              'section[data-id^="sectioneli5"]'
+            );
+            if (mainSection) {
+              const eli5Id = mainSection.getAttribute("data-id");
+              const eli5AudioSrc = audioFiles[eli5Id];
+
+              if (eli5AudioSrc) {
+                stopAudio();
+                eli5Active = true;
+                eli5Audio = new Audio(eli5AudioSrc);
+                eli5Audio.playbackRate = parseFloat(audioSpeed);
+                eli5Audio.play();
+
+                highlightElement(this);
+
+                eli5Audio.onended = () => {
+                  unhighlightElement(this);
+                  eli5Active = false;
+                  isPlaying = false;
+                  setPlayPauseIcon();
+                };
+
+                eli5Audio.onerror = () => {
+                  unhighlightElement(this);
+                  eli5Active = false;
+                  isPlaying = false;
+                  setPlayPauseIcon();
+                };
+
+                isPlaying = true;
+                setPlayPauseIcon();
+              }
+            }
+          }
+        });
     })
     .then(() => {
       MathJax.typeset();
@@ -249,9 +310,6 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("Error loading HTML:", error);
     });
 });
-
-
-
 
 // Handle keyboard events for navigation
 function handleKeyboardShortcuts(event) {
@@ -440,12 +498,30 @@ function applyTranslations() {
       }
     }
 
-    const element = document.querySelector(`[data-id="${key}"]`);
-    if (element) {
-      if (element.tagName === "IMG") {
-        element.setAttribute("alt", translations[translationKey]); // Set the alt text for images
-      } else {
-        element.textContent = translations[translationKey]; // Set the text content for other elements
+    const elements = document.querySelectorAll(`[data-id="${key}"]`);
+    elements.forEach((element) => {
+      if (element) {
+        if (element.tagName === "IMG") {
+          element.setAttribute("alt", translations[translationKey]); // Set the alt text for images
+        } else {
+          element.textContent = translations[translationKey]; // Set the text content for other elements
+        }
+      }
+    });
+  }
+
+  // Update eli5 content if eli5 mode is active
+  if (eli5Mode) {
+    const mainSection = document.querySelector(
+      'section[data-id^="sectioneli5"]'
+    );
+    if (mainSection) {
+      const eli5Id = mainSection.getAttribute("data-id");
+      const eli5Text = translations[eli5Id];
+
+      if (eli5Text) {
+        const eli5Container = document.getElementById("eli5-content");
+        eli5Container.textContent = eli5Text;
       }
     }
   }
@@ -457,6 +533,13 @@ function applyTranslations() {
   }
   // Gather the audio elements again based on the current mode (easy-read or normal)
   gatherAudioElements();
+}
+
+function translateText(textToTranslate, variables = {}) {
+  var newText = translations[textToTranslate];
+  if (!newText) return textToTranslate; // Return the original text if no translation is found
+
+  return newText.replace(/\${(.*?)}/g, (match, p1) => variables[p1] || "");
 }
 
 // Audio functionality
@@ -567,6 +650,17 @@ function toggleReadAloud() {
 }
 
 function loadToggleButtonState() {
+  // Ensure all required elements exist before proceeding
+  const readAloudIcon = document.getElementById("toggle-read-aloud-icon");
+  const eli5Icon = document.getElementById("toggle-eli5-icon");
+  const eli5Content = document.getElementById("eli5-content");
+
+  if (!readAloudIcon || !eli5Icon || !eli5Content) {
+    // If elements aren't ready, retry after a short delay
+    setTimeout(loadToggleButtonState, 100);
+    return;
+  }
+
   const readAloudModeCookie = getCookie("readAloudMode");
   const eli5ModeCookie = getCookie("eli5Mode");
 
@@ -588,8 +682,23 @@ function loadToggleButtonState() {
     document
       .getElementById("toggle-eli5-icon")
       .classList.toggle("fa-toggle-off", !eli5Mode);
-  }
 
+    // Automatically display ELI5 content if mode is enabled
+    if (eli5Mode && translations) {
+      const mainSection = document.querySelector(
+        'section[data-id^="sectioneli5"]'
+      );
+      if (mainSection) {
+        const eli5Id = mainSection.getAttribute("data-id");
+        const eli5Text = translations[eli5Id];
+        if (eli5Text) {
+          const eli5Container = document.getElementById("eli5-content");
+          eli5Container.textContent = eli5Text;
+          eli5Container.classList.remove("hidden");
+        }
+      }
+    }
+  }
   togglePlayBar();
 }
 
@@ -601,9 +710,58 @@ function toggleEli5Mode() {
   document
     .getElementById("toggle-eli5-icon")
     .classList.toggle("fa-toggle-off", !eli5Mode);
-  togglePlayBar();
-  stopAudio();
+
+  if (isPlaying) stopAudio();
   unhighlightAllElements();
+
+  // Automatically display ELI5 content when mode is toggled on
+  if (eli5Mode) {
+    // Find the main section element that contains the eli5 data-id
+    const mainSection = document.querySelector(
+      'section[data-id^="sectioneli5"]'
+    );
+    if (mainSection) {
+      const eli5Id = mainSection.getAttribute("data-id");
+      const eli5Text = translations[eli5Id];
+
+      if (eli5Text) {
+        // Update the ELI5 content in the sidebar
+        const eli5Container = document.getElementById("eli5-content");
+        eli5Container.textContent = eli5Text;
+        eli5Container.classList.remove("hidden");
+
+        // Highlight both the main section and the ELI5 content
+        //highlightElement(mainSection);
+
+        // If read aloud mode is active, start playing the audio
+        if (readAloudMode) {
+          highlightElement(eli5Container);
+          const eli5AudioSrc = audioFiles[eli5Id];
+          if (eli5AudioSrc) {
+            stopAudio();
+            eli5Active = true;
+            eli5Audio = new Audio(eli5AudioSrc);
+            eli5Audio.playbackRate = parseFloat(audioSpeed);
+            eli5Audio.play();
+
+            eli5Audio.onended = () => {
+              unhighlightElement(eli5Container);
+              eli5Active = false;
+              isPlaying = false;
+              setPlayPauseIcon();
+            };
+
+            isPlaying = true;
+            setPlayPauseIcon();
+          }
+        }
+      }
+    }
+  } else {
+    // Clear the ELI5 content when mode is turned off
+    document.getElementById("eli5-content").textContent = "";
+    document.getElementById("eli5-content").classList.add("hidden");
+  }
   setCookie("eli5Mode", eli5Mode, 7); // Save state in cookie
 }
 
@@ -648,7 +806,7 @@ function initializeAudioSpeed() {
 }
 
 function togglePlayBar() {
-  if (readAloudMode || eli5Mode) {
+  if (readAloudMode) {
     document.getElementById("play-bar").classList.remove("hidden");
     setCookie("playBarVisible", "true", 7); // Save state in cookie
   } else {
@@ -780,7 +938,7 @@ function unhighlightAllElements() {
 }
 
 function handleElementClick(event) {
-  if (readAloudMode || eli5Mode) {
+  if (readAloudMode) {
     const element = event.currentTarget;
     const dataId = element.getAttribute("data-id");
 
@@ -790,68 +948,35 @@ function handleElementClick(event) {
       }
     });
 
-    if (eli5Mode) {
-      if (dataId.startsWith("sectioneli5")) {
-        const eli5Text = translations[dataId];
-        const eli5AudioSrc = audioFiles[dataId];
-
-        document.getElementById("eli5-content").textContent = eli5Text;
+    // Always handle main content clicks, regardless of eli5 mode
+    if (!dataId.startsWith("sectioneli5")) {
+      const audioSrc = audioFiles[dataId];
+      if (audioSrc) {
+        stopAudio();
+        currentAudio = new Audio(audioSrc);
         highlightElement(element);
+        currentAudio.playbackRate = parseFloat(audioSpeed);
+        currentAudio.play();
+        currentIndex = audioElements.findIndex((item) => item.id === dataId);
 
-        if (eli5AudioSrc) {
-          stopAudio();
-          eli5Active = true;
-          eli5Audio = new Audio(eli5AudioSrc);
-          eli5Audio.playbackRate = parseFloat(audioSpeed);
-          eli5Audio.play();
+        currentAudio.onended = () => {
+          unhighlightElement(element);
+          currentIndex =
+            audioElements.findIndex((item) => item.id === dataId) + 1;
+          playAudioSequentially();
+        };
 
-          eli5Audio.onended = () => {
-            unhighlightElement(document.getElementById("eli5-content"));
-            eli5Active = false;
-            isPlaying = false;
-            setPlayPauseIcon();
-          };
+        currentAudio.onerror = () => {
+          unhighlightElement(element);
+          currentIndex =
+            audioElements.findIndex((item) => item.id === dataId) + 1;
+          playAudioSequentially();
+        };
 
-          eli5Audio.onerror = () => {
-            unhighlightElement(document.getElementById("eli5-content"));
-            eli5Active = false;
-            isPlaying = false;
-            setPlayPauseIcon();
-          };
-
-          isPlaying = true;
-        }
-      }
-    } else if (readAloudMode) {
-      if (!eli5Mode && !dataId.startsWith("sectioneli5")) {
-        // Handle normal audio elements
-        const audioSrc = audioFiles[dataId];
-        if (audioSrc) {
-          stopAudio();
-          currentAudio = new Audio(audioSrc);
-          highlightElement(element);
-          currentAudio.playbackRate = parseFloat(audioSpeed);
-          currentAudio.play();
-
-          currentAudio.onended = () => {
-            unhighlightElement(element);
-            currentIndex =
-              audioElements.findIndex((item) => item.id === dataId) + 1;
-            playAudioSequentially();
-          };
-
-          currentAudio.onerror = () => {
-            unhighlightElement(element);
-            currentIndex =
-              audioElements.findIndex((item) => item.id === dataId) + 1;
-            playAudioSequentially();
-          };
-
-          isPlaying = true;
-        }
+        isPlaying = true;
+        setPlayPauseIcon();
       }
     }
-    setPlayPauseIcon();
   }
 }
 
@@ -881,6 +1006,7 @@ function toggleNav() {
     "aria-hidden",
     navPopup.classList.contains("-translate-x-full") ? "true" : "false"
   );
+  navPopup.classList.toggle("left-2");
 }
 
 // Next and previous pages
